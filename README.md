@@ -1,6 +1,6 @@
 ## PostMessageAddon - an add-on for Vaadin Framework v7 for using html5's window.postMessage
 
-[Read about window.postMessage](https://developer.mozilla.org/en-US/docs/DOM/window.postMessage)
+[Read about window.postMessage](https://developer.mozilla.org/en-US/docs/DOM/window.postMessage),
 [HTML5 standard specification](http://www.whatwg.org/specs/web-apps/current-work/multipage/web-messaging.html#web-messaging)
 
 window.postMessage enables you to do cross-origin communication safely. This add-on has three server side components that enable your Vaadin application to do "Post Messaging" easily.
@@ -21,7 +21,7 @@ The project is licensed under the [Apache License, Version 2.0](http://www.apach
 
 ## Browser Compatibility
 
-[html5 window.postMessage compatibility](http://caniuse.com/#feat=x-doc-messaging)\
+[html5 window.postMessage compatibility](http://caniuse.com/#feat=x-doc-messaging),
 [Vaadin 7 supported browsers](http://vaadin.com/download/release/7.0/7.0.0/release-notes.html#supportedversions)
 
 
@@ -34,4 +34,4 @@ http://pekka.virtuallypreinstalled.com/PostMessageAddon/
 
 - Support other message types than String, like data objects File, Blob, FileList and ArrayBuffer.
 - Add support to PostMessageWindowUtils for listening to Post Messages from the opened windows.
-- Refactor PostMessageReceiver from a component into an UI Extension}
+- Refactor PostMessageReceiver from a component into an UI Extension
