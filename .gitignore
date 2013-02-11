@@ -1,0 +1,25 @@
+# Basic
+.project
+.classpath
+.settings
+build/
+rebel.xml
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+GWT development mode for PostMessageAddon.launch
+ivy.xml
+ivysettings.xml
+WebContent/VAADIN/
+WebContent/WEB-INF/
+
