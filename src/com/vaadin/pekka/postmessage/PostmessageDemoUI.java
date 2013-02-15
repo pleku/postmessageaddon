@@ -128,12 +128,12 @@ public class PostmessageDemoUI extends UI {
                                     public void buttonClick(ClickEvent event) {
                                         if (event.getButton().getCaption()
                                                 .equals("add")) {
-                                            content.addComponent(iframe);
+                                            layout2.addComponent(iframe);
                                             event.getButton()
                                                     .setCaption(
                                                             "Remove IFrame, but keep it");
                                         } else {
-                                            content.removeComponent(iframe);
+                                            layout2.removeComponent(iframe);
                                             event.getButton().setCaption("add");
                                         }
                                     }
@@ -150,7 +150,7 @@ public class PostmessageDemoUI extends UI {
                                         layout.removeComponent(event
                                                 .getComponent());
                                         layout.addComponent(button);
-                                        content.removeComponent(iframe);
+                                        layout2.removeComponent(iframe);
                                     }
                                 }));
 

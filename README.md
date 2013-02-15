@@ -30,8 +30,9 @@ The project is licensed under the [Apache License, Version 2.0](http://www.apach
 http://pekka.virtuallypreinstalled.com/PostMessageAddon/
 
 
-## TODO (1.0)
+## TODO (1.0.1)
 
 - Support other message types than String, like data objects File, Blob, FileList and ArrayBuffer.
 - Add support to PostMessageWindowUtils for listening to Post Messages from the opened windows.
 - Refactor PostMessageReceiver from a component into an UI Extension
+- Investigate IE support for popup windows using a workaround
