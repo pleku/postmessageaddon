@@ -23,6 +23,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.dom.client.IFrameElement;
+import com.vaadin.client.BrowserInfo;
 import com.vaadin.client.ui.VBrowserFrame;
 
 public class PostMessageIFrameWidget extends VBrowserFrame {
@@ -38,6 +39,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     String iframeOrigin = null;
 
     protected int pendingResponses = 0;
+    protected final boolean isIE8;
     protected List<String[]> waitingMessages;
     protected List<PostMessageIFrameWidgetHandler> handlers;
 
@@ -48,6 +50,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     public PostMessageIFrameWidget() {
         super();
 
+        isIE8 = BrowserInfo.get().isIE8();
         waitingMessages = new ArrayList<String[]>();
         handlers = new ArrayList<PostMessageIFrameWidgetHandler>();
     }
@@ -137,7 +140,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     }
 
     void onIFrameLoad(String str) {
-        if (src != null && src.equals(str)) {
+        if (src != null && (src.equals(str) || str.equals("ie"))) {
             iframeLoaded = true;
             if (!waitingMessages.isEmpty()) {
                 schedulePostMessagesAfterDelay();
@@ -163,7 +166,14 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     /*-{
         var self = this;
         var onloadfunct = function(event) {
-            var str = event.target.src;
+            var str;
+            if (event && event.target && event.target.src) {
+                str = event.target.src;
+            } else if (event && event.srcElement && event.srcElement.src) {
+                str = event.srcElement.src;
+            } else {
+                str = 'ie';
+            }
             if (str && (0 !== str.length) ) 
                 self.@com.vaadin.pekka.postmessage.client.iframe.PostMessageIFrameWidget::onIFrameLoad(Ljava/lang/String;)(str);
         };
@@ -203,13 +213,21 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
             }
             self.@com.vaadin.pekka.postmessage.client.iframe.PostMessageIFrameWidget::setupListener()();
         };
-        $wnd.addEventListener('message', respFunc, false);
+        if ($wnd.addEventListener) {
+            $wnd.addEventListener('message', respFunc, false);
+        } else {
+            $wnd.attachEvent('onmessage', respFunc);
+        }
         return respFunc;
     }-*/;
 
     protected native void removeResponseListener(JavaScriptObject l)
     /*-{
-    	$wnd.removeEventListener('message', l, false);
+        if ($wnd.addEventListener) {
+    	    $wnd.removeEventListener('message', l, false);
+    	} else {
+    	    $wnd.detachevent('onmessage', l);
+    	}
     }-*/;
 
 }

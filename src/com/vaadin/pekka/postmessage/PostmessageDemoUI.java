@@ -39,7 +39,7 @@ import com.vaadin.ui.VerticalLayout;
 @SuppressWarnings("serial")
 public class PostmessageDemoUI extends UI {
 
-    private final String iframeOrigin1 = "http://pekka.virtuallypreinstalled.com:8080";
+    private final String iframeOrigin1 = "http://pekka.virtuallypreinstalled.com";
     private final String iframeLocation1 = "http://pekka.virtuallypreinstalled.com/PostMessageReceiverTest";
     private final String iframeOrigin2 = "http://pekkahyvonen.com";
     private final String iframeLocation2 = "http://pekkahyvonen.com/postmessage_app_test.html";
@@ -75,7 +75,7 @@ public class PostmessageDemoUI extends UI {
                         Object value = winselect.getValue();
                         if (value != null && value instanceof PostMessageWindow) {
                             ((PostMessageWindow) value)
-                                    .postMessage("respond, Hello from parent");
+                                    .postMessage("respond, message from parent");
                         }
                     }
                 });
@@ -95,8 +95,8 @@ public class PostmessageDemoUI extends UI {
                             window = windowOpener.openWindow(iframeLocation1,
                                     iframeOrigin1, "width=400,height=400");
                         } else {
-                            window = windowOpener.openWindow(iframeLocation1,
-                                    iframeOrigin1, "width=400,height=400");
+                            window = windowOpener.openWindow(iframeLocation3,
+                                    iframeOrigin3, "width=400,height=400");
                         }
                         winselect.addItem(window);
                     }
@@ -219,10 +219,10 @@ public class PostmessageDemoUI extends UI {
 
                         iframe.setAlternateText("Loading...");
                         layout2.addComponent(iframe);
-                        iframe.setIframeOrigin(iframeOrigin3);
+                        iframe.setIframeOrigin(iframeOrigin1);
                         iframe.postMessageToIFrame(
                                 "Hello there (sent before load)", false);
-                        iframe.setSource(new ExternalResource(iframeLocation3));
+                        iframe.setSource(new ExternalResource(iframeLocation1));
                     }
                 }));
     }
@@ -261,7 +261,7 @@ public class PostmessageDemoUI extends UI {
         cb.addItem(iframeOrigin1);
         cb.addItem(iframeOrigin2);
         cb.addItem(iframeOrigin3);
-        cb.setValue(iframeOrigin3);
+        cb.setValue(iframeOrigin1);
         return cb;
     }
 }

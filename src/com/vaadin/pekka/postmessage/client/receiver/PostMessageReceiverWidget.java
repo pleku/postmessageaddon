@@ -23,6 +23,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.user.client.ui.Widget;
+import com.vaadin.client.BrowserInfo;
 
 public class PostMessageReceiverWidget extends Widget {
 
@@ -59,6 +60,8 @@ public class PostMessageReceiverWidget extends Widget {
 
     protected final List<PostMessageReceiverHandler> handlers;
 
+    protected final boolean isIE8;
+
     boolean cacheMessages = true;
 
     public PostMessageReceiverWidget() {
@@ -69,6 +72,7 @@ public class PostMessageReceiverWidget extends Widget {
         messageList = new ArrayList<Message>();
         handlers = new ArrayList<PostMessageReceiverHandler>();
         listener = addMessageHandler();
+        isIE8 = BrowserInfo.get().isIE8();
     }
 
     protected void createDOM() {
@@ -191,13 +195,21 @@ public class PostMessageReceiverWidget extends Widget {
                 self.@com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverWidget::handleMessage(Ljava/lang/String;Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(message,origin,src);
             }
         };
-        $wnd.addEventListener('message', receiver, false);
+        if ($wnd.addEventListener) {
+            $wnd.addEventListener('message', receiver, false);
+        } else {
+            $wnd.attachEvent('onmessage', receiver);
+        }
         return receiver; 
     }-*/;
 
     private native void removeMessageHandler(JavaScriptObject listener)
     /*-{
-        $wnd.removeEventListener('message', listener, false);
+        if ($wnd.removeEventListener) {
+            $wnd.removeEventListener('message', listener, false);
+        } else {
+            $wnd.detachEvent('onmessage', listener);
+        }
     }-*/;
 
     private native void respondToMessage(JavaScriptObject source,
