@@ -5,7 +5,7 @@
 	<groupId>org.vaadin.pekka</groupId>
 	<artifactId>postmessage</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 	<name>PostMessageIFrame Add-on</name>
 
 	<properties>
@@ -129,7 +129,7 @@
 							<!-- Package format version - do not change -->
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
 							<Vaadin-License-Title>${Vaadin-License-Title}</Vaadin-License-Title>
-							<Vaadin-Widgetsets>org.vaadin.pekka.postmessage.WidgetSet</Vaadin-Widgetsets>
+							<Vaadin-Widgetsets>com.vaadin.pekka.postmessage.PostmessageaddonWidgetset</Vaadin-Widgetsets>
 						</manifestEntries>
 					</archive>
 				</configuration>

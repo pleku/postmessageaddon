@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,15 +31,15 @@ import com.vaadin.ui.Component;
  * A component for listening to Post Messages in this Vaadin application and
  * responding to them. Also helps sending messages to parent window (if any).
  * Adds a div-element with display:none to the DOM.
- * 
+ *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
- * 
- * 
+ *
+ *
  * TODO convert to an extension and remove widget class, while keeping GWT
  * compatibility
- * 
+ *
  * @author pekkahyvonen
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class PostMessageReceiver extends AbstractComponent {
@@ -65,9 +65,9 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * An event fired when a Post Message has been received by
      * {@link PostMessageReceiver} from one of the trusted origins.
-     * 
+     *
      * @author pekkahyvonen
-     * 
+     *
      */
     public static class PostMessageReceiverEvent extends PostMessageEvent {
 
@@ -84,12 +84,12 @@ public class PostMessageReceiver extends AbstractComponent {
          * source or optionally the parent of the source of this message. The
          * origin and the source of the original message will be automatically
          * reused.
-         * 
+         *
          * If the source of this message was a GWT or a Vaadin application, then
          * the <code>parent</code> should be <code>true</code>, because the
          * message source is actually an iframe running the application instead
          * of the window.
-         * 
+         *
          * @param message
          *            the message to send
          * @param parent
@@ -104,10 +104,11 @@ public class PostMessageReceiver extends AbstractComponent {
         }
 
         /**
-         * Returns true if this message was received while {@link #isCached()}
-         * mode was on.
-         * 
-         * @return true if message was cached, false if not
+         * Returns true if this message was received while
+         * {@link PostMessageReceiver#isCacheMessages()} mode was on.
+         *
+         * @return <code>true</code> if message was cached, <code>false</code>
+         *         if not
          */
         public boolean isCached() {
             return cached;
@@ -116,10 +117,11 @@ public class PostMessageReceiver extends AbstractComponent {
     }
 
     /**
-     * Add an accepted message origin. If {@link #isCached()} mode is on (true),
-     * and the cache has any messages for this origin, then those events for
-     * this message will fired.
-     * 
+     * Add an accepted message origin. If
+     * {@link PostMessageReceiver#isCacheMessages()} mode is on (true), and the
+     * cache has any messages for this origin, then those events for this
+     * message will fired.
+     *
      * @param messageOrigin
      *            the message origin to accept
      */
@@ -137,7 +139,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * Remove an accepted message origin. After this, no messages for this
      * origin will get through, but if {@link #isCacheMessages()} mode is on,
      * then they are still cached.
-     * 
+     *
      * @param messageOrigin
      */
     public void removeAcceptedMessageOrigin(final String messageOrigin) {
@@ -151,7 +153,7 @@ public class PostMessageReceiver extends AbstractComponent {
     }
 
     /**
-     * 
+     *
      * @return an unmodifiable list of the current accepted message origins
      */
     public List<String> getAcceptedMessageOrigins() {
@@ -164,9 +166,9 @@ public class PostMessageReceiver extends AbstractComponent {
      * get added to accepted message origins with
      * {@link #addAcceptedMessageOrigin(String)} or until the cache is disabled,
      * which will also clear it.
-     * 
+     *
      * Default value is <code>true</code>.
-     * 
+     *
      * @return true if messages are cached, false if not.
      */
     public boolean isCacheMessages() {
@@ -179,9 +181,9 @@ public class PostMessageReceiver extends AbstractComponent {
      * the messages' origin will get added to accepted message origins with
      * {@link #addAcceptedMessageOrigin(String)}. Disabling the cache will clear
      * all the currently cached messages.
-     * 
+     *
      * Default value is <code>true</code>.
-     * 
+     *
      * @param cacheMessages
      *            true to turn cache on, false to turn it off
      */
@@ -192,10 +194,10 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * Post Message to the parent of the window that contains this receiver (if
      * the window has any parent).
-     * 
+     *
      * If the parent of the window has a different origin, the message will not
      * get posted.
-     * 
+     *
      * @param message
      *            the message to post
      * @param messageOrigin
@@ -234,9 +236,9 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * An interface for listening {@link PostMessageReceiverEvent} events from a
      * {@link PostMessageReceiver}.
-     * 
+     *
      * @author pekkahyvonen
-     * 
+     *
      */
     public interface PostMessageReceiverListener extends Serializable {
 
@@ -244,7 +246,7 @@ public class PostMessageReceiver extends AbstractComponent {
          * Called on a {@link PostMessageReceiverEvent} from a
          * {@link PostMessageReceiver} represented by
          * {@link PostMessageReceiverEvent#getSource()};
-         * 
+         *
          * @param event
          */
         public void onMessage(PostMessageReceiverEvent event);
@@ -254,7 +256,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * Registers a {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiver}.
-     * 
+     *
      * @param listener
      *            the listener to register
      */
@@ -266,7 +268,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * Registers a {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiver}.
-     * 
+     *
      * @param listener
      *            the listener to register
      */
@@ -279,7 +281,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * Removes a registered {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiver}.
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -291,7 +293,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * Removes a registered {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiver}.
-     * 
+     *
      * @param listener
      *            the listener to remove
      */

@@ -17,7 +17,6 @@ package com.vaadin.pekka.postmessage.demo;
 
 import javax.servlet.annotation.WebServlet;
 
-import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Property;
@@ -44,24 +43,21 @@ import com.vaadin.ui.VerticalLayout;
 /**
  * Main UI class
  */
-@Theme("postmessageaddontheme")
 @Title("PostMessageIFrame Add-on Demo")
 @SuppressWarnings("serial")
 public class PostmessageDemoUI extends UI {
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = PostmessageDemoUI.class, widgetset = "org.vaadin.pekka.postmessage.demo.DemoWidgetSet")
+    @VaadinServletConfiguration(productionMode = false, ui = PostmessageDemoUI.class, widgetset = "com.vaadin.pekka.postmessage.demo.DemoWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
     private final String iframeOrigin1 = "http://pekka.virtuallypreinstalled.com";
     private final String iframeLocation1 = "http://pekka.virtuallypreinstalled.com/PostMessageReceiverTest";
-    private final String iframeOrigin2 = "http://pekkahyvonen.com";
-    private final String iframeLocation2 = "http://pekkahyvonen.com/postmessage_app_test.html";
+    private final String iframeOrigin2 = "http://pekka.app.fi";
+    private final String iframeLocation2 = "http://pekka.app.fi/PostMessageReceiverTest";
     private final String iframeOrigin3 = "http://localhost:8080";
     private final String iframeLocation3 = "http://localhost:8080/PostMessageReceiverTest";
-    private final String iframeOrigin4 = "http://192.168.0.16:8080";
-    private final String iframeLocation4 = "http://192.168.0.16:8080/PostMessageReceiverTest?debug";
 
     @Override
     protected void init(VaadinRequest request) {
@@ -265,11 +261,6 @@ public class PostmessageDemoUI extends UI {
                     iframe.postMessageToIFrame(
                             "Hello there (sent before load)", false);
                     iframe.setSource(new ExternalResource(iframeLocation3));
-                } else {
-                    iframe.setIframeOrigin(iframeOrigin4);
-                    iframe.postMessageToIFrame(
-                            "Hello there (sent before load)", false);
-                    iframe.setSource(new ExternalResource(iframeLocation4));
                 }
             }
         });
@@ -283,7 +274,6 @@ public class PostmessageDemoUI extends UI {
         cb.addItem(iframeOrigin1);
         cb.addItem(iframeOrigin2);
         cb.addItem(iframeOrigin3);
-        cb.addItem(iframeOrigin4);
         cb.setValue(iframeOrigin1);
         return cb;
     }

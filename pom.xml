@@ -11,6 +11,7 @@
 	<modules>
 		<module>postmessage</module>
 		<module>postmessage-demo</module>
+		<module>postmessage-receiver-demo</module>
 	</modules>
 
 </project>

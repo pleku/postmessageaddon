@@ -30,9 +30,7 @@
     <!-- <set-configuration-property name="devModeRedirectEnabled" value="true" /> -->
 
 
-    <inherits name="com.vaadin.DefaultWidgetSet" />
-
-    
-
     <inherits name="com.vaadin.pekka.postmessage.PostmessageaddonWidgetset" />
+
+    <inherits name="com.vaadin.DefaultWidgetSet" />
 </module>

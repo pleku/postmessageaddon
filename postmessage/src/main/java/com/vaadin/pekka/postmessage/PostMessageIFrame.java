@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ * Copyright 2015 Pekka Hyvönen, pekka@vaadin.com
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,12 +28,12 @@ import com.vaadin.ui.Component;
 
 /**
  * A component for opening a different origin location in an iframe for sending
- * & receiving Post Messages from it.
- * 
+ * and receiving Post Messages from it.
+ *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
- * 
+ *
  * @author pekkahyvonen
- * 
+ *
  */
 @SuppressWarnings("serial")
 public class PostMessageIFrame extends BrowserFrame {
@@ -49,9 +49,7 @@ public class PostMessageIFrame extends BrowserFrame {
     /**
      * An event for a Post Message received from a {@link PostMessageIFrame}
      * component.
-     * 
-     * @author pekkahyvonen
-     * 
+     *
      */
     public static class PostMessageIFrameEvent extends PostMessageEvent {
 
@@ -64,11 +62,12 @@ public class PostMessageIFrame extends BrowserFrame {
          * Respond to this specific message by sending a Post Message to same
          * {@link PostMessageIFrame} that this {@link PostMessageIFrameEvent}
          * originated from.
-         * 
+         *
          * For more info, see
          * {@link PostMessageIFrame#postMessageToIFrame(String, boolean)}
-         * 
+         *
          * @param message
+         *            the text message to send
          * @param listenToResponse
          *            true if need to listen for response, false if no need to
          *            listen for response
@@ -87,8 +86,9 @@ public class PostMessageIFrame extends BrowserFrame {
 
     /**
      * Creates an empty iframe with caption.
-     * 
+     *
      * @param caption
+     *            the caption for the iframe
      */
     public PostMessageIFrame(String caption) {
         this(caption, null, null);
@@ -96,7 +96,7 @@ public class PostMessageIFrame extends BrowserFrame {
 
     /**
      * Creates an iframe with the given location and origin.
-     * 
+     *
      * @param sourceURL
      *            the Source of the iframe.
      * @param iframeOrigin
@@ -108,8 +108,9 @@ public class PostMessageIFrame extends BrowserFrame {
 
     /**
      * Creates an iframe with the given caption, location and origin.
-     * 
+     *
      * @param caption
+     *            the caption for the iframe
      * @param sourceURL
      *            the Source of the iframe
      * @param iframeOrigin
@@ -134,7 +135,7 @@ public class PostMessageIFrame extends BrowserFrame {
      * a postMessage listener will be added and removed right after the next
      * received message (without actually knowing if it was the actual response
      * to this message").
-     * 
+     *
      * @param message
      *            the message to send
      * @param listenToResponse
@@ -156,7 +157,7 @@ public class PostMessageIFrame extends BrowserFrame {
     }
 
     /**
-     * 
+     *
      * @return the current iframeOrigin used for posting and receiving messages
      */
     public String getIframeOrigin() {
@@ -167,8 +168,9 @@ public class PostMessageIFrame extends BrowserFrame {
      * Set the iframe origin that will be used for messaging. If the iframe's
      * actual origin will be something else than this, the messages won't be
      * send and any possible received messages will be ignored.
-     * 
+     *
      * @param iframeOrigin
+     *            the target origin for the messages
      */
     public void setIframeOrigin(String iframeOrigin) {
         if (iframeOrigin == null || iframeOrigin.isEmpty()) {
@@ -180,7 +182,7 @@ public class PostMessageIFrame extends BrowserFrame {
 
     /**
      * Default value is false
-     * 
+     *
      * @return true if always listening for messages from the iframe's origin,
      *         false if not
      */
@@ -190,8 +192,9 @@ public class PostMessageIFrame extends BrowserFrame {
 
     /**
      * Start or stop to listen to messages from the iframe's origin.
-     * 
+     *
      * @param alwaysListen
+     *            <code>true</code> to listen, <code>false</code> to not
      */
     public void setAlwaysListen(boolean alwaysListen) {
         getState().alwaysListen = alwaysListen;
@@ -219,9 +222,6 @@ public class PostMessageIFrame extends BrowserFrame {
     /**
      * An interface for listening {@link PostMessageIFrameEvent} events from a
      * {@link PostMessageIFrame}.
-     * 
-     * @author pekkahyvonen
-     * 
      */
     public interface PostMessageIFrameListener extends Serializable {
 
@@ -229,8 +229,9 @@ public class PostMessageIFrame extends BrowserFrame {
          * Called on a {@link PostMessageIFrameEvent} from a
          * {@link PostMessageIFrame} represented by
          * {@link PostMessageIFrameEvent#getSource()}.
-         * 
+         *
          * @param event
+         *            the post message received from the iframe
          */
         public void onMessage(PostMessageIFrameEvent event);
     }
@@ -239,7 +240,7 @@ public class PostMessageIFrame extends BrowserFrame {
      * Registers a {@link PostMessageIFrameListener} listener for
      * {@link PostMessageIFrameEvent} events from this {@link PostMessageIFrame}
      * .
-     * 
+     *
      * @param listener
      *            the listener to register
      */
@@ -251,7 +252,7 @@ public class PostMessageIFrame extends BrowserFrame {
      * Registers a {@link PostMessageIFrameListener} listener for
      * {@link PostMessageIFrameEvent} events from this {@link PostMessageIFrame}
      * .
-     * 
+     *
      * @param listener
      *            the listener to register
      */
@@ -264,7 +265,7 @@ public class PostMessageIFrame extends BrowserFrame {
      * Removes a registered {@link PostMessageIFrameListener} listener for
      * {@link PostMessageIFrameEvent} events from this {@link PostMessageIFrame}
      * .
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -276,7 +277,7 @@ public class PostMessageIFrame extends BrowserFrame {
      * Removes a registered {@link PostMessageIFrameListener} listener for
      * {@link PostMessageIFrameEvent} events from this {@link PostMessageIFrame}
      * .
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
