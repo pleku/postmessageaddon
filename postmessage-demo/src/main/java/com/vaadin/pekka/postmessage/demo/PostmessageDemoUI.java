@@ -50,7 +50,7 @@ import com.vaadin.ui.VerticalLayout;
 public class PostmessageDemoUI extends UI {
 
     @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = DemoUI.class, widgetset = "org.vaadin.pekka.postmessage.demo.DemoWidgetSet")
+    @VaadinServletConfiguration(productionMode = false, ui = PostmessageDemoUI.class, widgetset = "org.vaadin.pekka.postmessage.demo.DemoWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
