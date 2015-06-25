@@ -53,11 +53,11 @@ public class PostmessageDemoUI extends UI {
     }
 
     private final String iframeOrigin1 = "http://pekka.virtuallypreinstalled.com";
-    private final String iframeLocation1 = "http://pekka.virtuallypreinstalled.com/PostMessageReceiverTest";
+    private final String iframeLocation1 = "http://pekka.virtuallypreinstalled.com/postmessage-receiver-demo";
     private final String iframeOrigin2 = "http://pekka.app.fi";
-    private final String iframeLocation2 = "http://pekka.app.fi/PostMessageReceiverTest";
-    private final String iframeOrigin3 = "http://localhost:8080";
-    private final String iframeLocation3 = "http://localhost:8080/PostMessageReceiverTest";
+    private final String iframeLocation2 = "http://pekka.app.fi/postmessage-receiver-demo";
+    private final String iframeOrigin3 = "http://localhost:8088";
+    private final String iframeLocation3 = "http://localhost:8088/postmessage-receiver-demo";
 
     @Override
     protected void init(VaadinRequest request) {

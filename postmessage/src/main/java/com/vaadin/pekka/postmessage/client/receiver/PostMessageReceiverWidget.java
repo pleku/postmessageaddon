@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -181,6 +181,11 @@ public class PostMessageReceiverWidget extends Widget {
         $wnd.parent.postMessage(message, targetOrigin);
     }-*/;
 
+    public native void postMessageToOpener(String message, String targetOrigin)
+    /*-{
+        $wnd.opener.postMessage(message, targetOrigin);
+     }-*/;
+
     private native JavaScriptObject addMessageHandler()
     /*-{
         var self = this;
@@ -200,7 +205,7 @@ public class PostMessageReceiverWidget extends Widget {
         } else {
             $wnd.attachEvent('onmessage', receiver);
         }
-        return receiver; 
+        return receiver;
     }-*/;
 
     private native void removeMessageHandler(JavaScriptObject listener)
@@ -218,7 +223,7 @@ public class PostMessageReceiverWidget extends Widget {
     	if (parent)
     	{
     		source.parent.postMessage(message, origin);
-    	} else 
+    	} else
     	{
     		source.postMessage(message, origin);
     	}

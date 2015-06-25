@@ -192,11 +192,11 @@ public class PostMessageReceiver extends AbstractComponent {
     }
 
     /**
-     * Post Message to the parent of the window that contains this receiver (if
-     * the window has any parent).
+     * Post Message to the parent of the frame (window.parent) that contains
+     * this receiver (if there is such parent).
      *
      * If the parent of the window has a different origin, the message will not
-     * get posted.
+     * get posted. For any origin, use "*".
      *
      * @param message
      *            the message to post
@@ -211,7 +211,26 @@ public class PostMessageReceiver extends AbstractComponent {
         }
         getRpcProxy(PostMessageReceiverClientRpc.class).postMessageToParent(
                 message, messageOrigin);
+    }
 
+    /**
+     * Post message to the opener (window.opener) of this window that contains
+     * this receiver.
+     *
+     * If the parent of the window has a different origin, the message will not
+     * get posted. For any origin, use "*".
+     *
+     * @param message
+     * @param messageOrigin
+     */
+    public void postMessageToOpener(final String message,
+            final String messageOrigin) {
+        if (messageOrigin == null || messageOrigin.isEmpty()) {
+            throw new InvalidParameterException(
+                    "Message Origin cannot be null or empty");
+        }
+        getRpcProxy(PostMessageReceiverClientRpc.class).postMessageToOpener(
+                message, messageOrigin);
     }
 
     protected void fireMessageEvent(final String msg, final String org,

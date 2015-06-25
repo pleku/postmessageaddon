@@ -81,9 +81,12 @@ public class PostmessagereceivertestUI extends UI {
                                 "window.parent.postMessage('"
                                         + messageField.getValue()
                                         + "', 'http://pekka.virtuallypreinstalled.com');");
+                getPage().getJavaScript().execute(
+                        "window.parent.postMessage('" + messageField.getValue()
+                                + "', 'http://pekka.app.fi');");
             }
         });
-        layout.addComponent(button3);
+        // layout.addComponent(button3);
 
         Button button4 = new Button("post to $wnd.parent using receiver");
         button4.addClickListener(new Button.ClickListener() {
@@ -93,9 +96,25 @@ public class PostmessagereceivertestUI extends UI {
                         "http://localhost:8080");
                 receiver.postMessageToParent(messageField.getValue(),
                         "http://pekka.virtuallypreinstalled.com");
+                receiver.postMessageToParent(messageField.getValue(),
+                        "http://pekka.app.fi");
             }
         });
         layout.addComponent(button4);
+
+        Button button5 = new Button("post to $wnd.opener using receiver");
+        button4.addClickListener(new Button.ClickListener() {
+
+            public void buttonClick(ClickEvent event) {
+                receiver.postMessageToOpener(messageField.getValue(),
+                        "http://localhost:8080");
+                receiver.postMessageToOpener(messageField.getValue(),
+                        "http://pekka.virtuallypreinstalled.com");
+                receiver.postMessageToOpener(messageField.getValue(),
+                        "http://pekka.app.fi");
+            }
+        });
+        layout.addComponent(button5);
 
         final Button button2 = new Button(
                 "add parent location to trusted origins");
@@ -106,7 +125,7 @@ public class PostmessagereceivertestUI extends UI {
             public void buttonClick(ClickEvent event) {
                 receiver.addAcceptedMessageOrigin("http://localhost:8080");
                 receiver.addAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
-                receiver.addAcceptedMessageOrigin("http://192.168.0.16:8080");
+                receiver.addAcceptedMessageOrigin("http://pekka.app.fi");
                 event.getButton().setEnabled(false);
                 button1.setEnabled(true);
             }
@@ -119,7 +138,7 @@ public class PostmessagereceivertestUI extends UI {
             public void buttonClick(ClickEvent event) {
                 receiver.removeAcceptedMessageOrigin("http://localhost:8080");
                 receiver.removeAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
-                receiver.removeAcceptedMessageOrigin("http://192.168.0.16:8080");
+                receiver.removeAcceptedMessageOrigin("http://pekka.app.fi");
                 event.getButton().setEnabled(false);
                 button2.setEnabled(true);
             }
