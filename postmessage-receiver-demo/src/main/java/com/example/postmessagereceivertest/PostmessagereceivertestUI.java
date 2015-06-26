@@ -3,9 +3,9 @@ package com.example.postmessagereceivertest;
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.pekka.postmessage.PostMessageReceiver;
-import com.vaadin.pekka.postmessage.PostMessageReceiver.PostMessageReceiverEvent;
-import com.vaadin.pekka.postmessage.PostMessageReceiver.PostMessageReceiverListener;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverEvent;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
@@ -40,8 +40,9 @@ public class PostmessagereceivertestUI extends UI {
         final VerticalLayout messages = new VerticalLayout();
         panel.setContent(messages);
 
-        final PostMessageReceiver receiver = new PostMessageReceiver();
-        receiver.setId("PostMessageReceiver");
+        final PostMessageReceiverExtension receiver = new PostMessageReceiverExtension();
+        addExtension(receiver);
+
         final TextField messageField = new TextField("Type message here");
         layout.addComponent(messageField);
 
@@ -103,7 +104,7 @@ public class PostmessagereceivertestUI extends UI {
         layout.addComponent(button4);
 
         Button button5 = new Button("post to $wnd.opener using receiver");
-        button4.addClickListener(new Button.ClickListener() {
+        button5.addClickListener(new Button.ClickListener() {
 
             public void buttonClick(ClickEvent event) {
                 receiver.postMessageToOpener(messageField.getValue(),
@@ -144,8 +145,6 @@ public class PostmessagereceivertestUI extends UI {
             }
         });
         layout.addComponent(button1);
-
-        layout.addComponent(receiver);
 
         layout.addComponent(panel);
 

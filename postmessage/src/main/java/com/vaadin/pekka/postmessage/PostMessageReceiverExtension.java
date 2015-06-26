@@ -24,25 +24,26 @@ import java.util.List;
 import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverClientRpc;
 import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverServerRpc;
 import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverState;
-import com.vaadin.ui.AbstractComponent;
+import com.vaadin.server.AbstractExtension;
 import com.vaadin.ui.Component;
 
 /**
- * A component for listening to Post Messages in this Vaadin application and
+ * An extension for listening to Post Messages in a Vaadin application and
  * responding to them. Also helps sending messages to parent window (if any).
- * Adds a div-element with display:none to the DOM.
+ * <p>
+ * When using inside an iframe, use {@link #postMessageToParent(String, String)}.
+ * <p>
+ * When using inside a sub window and want to send to opener window, use
+ * {@link #postMessageToOpener(String, String)}.
+ * <p>
+ * For sending messages to an opened window, use {@link PostMessageWindowUtil}.
  *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
  *
- *
- * TODO convert to an extension and remove widget class, while keeping GWT
- * compatibility
- *
  * @author pekkahyvonen
- *
  */
 @SuppressWarnings("serial")
-public class PostMessageReceiver extends AbstractComponent {
+public class PostMessageReceiverExtension extends AbstractExtension {
 
     private PostMessageReceiverServerRpc rpc = new PostMessageReceiverServerRpc() {
 
@@ -53,7 +54,7 @@ public class PostMessageReceiver extends AbstractComponent {
         }
     };
 
-    public PostMessageReceiver() {
+    public PostMessageReceiverExtension() {
         registerRpc(rpc);
     }
 
@@ -64,7 +65,7 @@ public class PostMessageReceiver extends AbstractComponent {
 
     /**
      * An event fired when a Post Message has been received by
-     * {@link PostMessageReceiver} from one of the trusted origins.
+     * {@link PostMessageReceiverExtension} from one of the trusted origins.
      *
      * @author pekkahyvonen
      *
@@ -73,10 +74,14 @@ public class PostMessageReceiver extends AbstractComponent {
 
         private final boolean cached;
 
+        private final PostMessageReceiverExtension extension;
+
         public PostMessageReceiverEvent(Component source, String origin,
-                String message, Integer messageId, boolean cached) {
+                String message, Integer messageId, boolean cached,
+                PostMessageReceiverExtension extension) {
             super(source, origin, message, messageId);
             this.cached = cached;
+            this.extension = extension;
         }
 
         /**
@@ -99,13 +104,12 @@ public class PostMessageReceiver extends AbstractComponent {
          */
         @Override
         public void respond(String message, boolean parent) {
-            ((PostMessageReceiver) super.getComponent()).respondToMessage(
-                    getMessageId(), message, parent);
+            extension.respondToMessage(getMessageId(), message, parent);
         }
 
         /**
          * Returns true if this message was received while
-         * {@link PostMessageReceiver#isCacheMessages()} mode was on.
+         * {@link PostMessageReceiverExtension#isCacheMessages()} mode was on.
          *
          * @return <code>true</code> if message was cached, <code>false</code>
          *         if not
@@ -118,9 +122,9 @@ public class PostMessageReceiver extends AbstractComponent {
 
     /**
      * Add an accepted message origin. If
-     * {@link PostMessageReceiver#isCacheMessages()} mode is on (true), and the
-     * cache has any messages for this origin, then those events for this
-     * message will fired.
+     * {@link PostMessageReceiverExtension#isCacheMessages()} mode is on (true),
+     * and the cache has any messages for this origin, then those events for
+     * this message will fired.
      *
      * @param messageOrigin
      *            the message origin to accept
@@ -141,6 +145,7 @@ public class PostMessageReceiver extends AbstractComponent {
      * then they are still cached.
      *
      * @param messageOrigin
+     *            the origin to remove
      */
     public void removeAcceptedMessageOrigin(final String messageOrigin) {
         if (messageOrigin == null || messageOrigin.isEmpty()) {
@@ -221,7 +226,9 @@ public class PostMessageReceiver extends AbstractComponent {
      * get posted. For any origin, use "*".
      *
      * @param message
+     *            the message to post
      * @param messageOrigin
+     *            the target origin
      */
     public void postMessageToOpener(final String message,
             final String messageOrigin) {
@@ -235,7 +242,8 @@ public class PostMessageReceiver extends AbstractComponent {
 
     protected void fireMessageEvent(final String msg, final String org,
             final Integer id, Boolean cached) {
-        fireEvent(new PostMessageReceiverEvent(this, org, msg, id, cached));
+        fireEvent(new PostMessageReceiverEvent((Component) getParent(), org,
+                msg, id, cached, this));
     }
 
     private static final Method POST_MESSAGE_EVENT_METHOD;
@@ -254,7 +262,7 @@ public class PostMessageReceiver extends AbstractComponent {
 
     /**
      * An interface for listening {@link PostMessageReceiverEvent} events from a
-     * {@link PostMessageReceiver}.
+     * {@link PostMessageReceiverExtension}.
      *
      * @author pekkahyvonen
      *
@@ -263,10 +271,11 @@ public class PostMessageReceiver extends AbstractComponent {
 
         /**
          * Called on a {@link PostMessageReceiverEvent} from a
-         * {@link PostMessageReceiver} represented by
+         * {@link PostMessageReceiverExtension} represented by
          * {@link PostMessageReceiverEvent#getSource()};
          *
          * @param event
+         *            the message event
          */
         public void onMessage(PostMessageReceiverEvent event);
     }
@@ -274,7 +283,7 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * Registers a {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
-     * {@link PostMessageReceiver}.
+     * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to register
@@ -286,7 +295,7 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * Registers a {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
-     * {@link PostMessageReceiver}.
+     * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to register
@@ -299,7 +308,7 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * Removes a registered {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
-     * {@link PostMessageReceiver}.
+     * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to remove
@@ -311,7 +320,7 @@ public class PostMessageReceiver extends AbstractComponent {
     /**
      * Removes a registered {@link PostMessageReceiverListener} listener for
      * {@link PostMessageReceiverEvent} events from this
-     * {@link PostMessageReceiver}.
+     * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to remove

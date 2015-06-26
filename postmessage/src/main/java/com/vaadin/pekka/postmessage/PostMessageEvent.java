@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,9 +19,9 @@ import com.vaadin.ui.Component;
 
 /**
  * Represents the basic properties of a Post Message event.
- * 
+ *
  * @author pekkahyvonen
- * 
+ *
  */
 @SuppressWarnings("serial")
 public abstract class PostMessageEvent extends Component.Event {
@@ -39,7 +39,7 @@ public abstract class PostMessageEvent extends Component.Event {
     }
 
     /**
-     * 
+     *
      * @return the origin where the message came from
      */
     public String getOrigin() {
@@ -47,7 +47,7 @@ public abstract class PostMessageEvent extends Component.Event {
     }
 
     /**
-     * 
+     *
      * @return the actual message
      */
     public String getMessage() {
@@ -55,7 +55,7 @@ public abstract class PostMessageEvent extends Component.Event {
     }
 
     /**
-     * 
+     *
      * @return an id for the message, or -1 if component doesn't identify
      *         messages with ids
      */

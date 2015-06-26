@@ -20,78 +20,61 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.dom.client.Style.Display;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.vaadin.client.BrowserInfo;
 
-public class PostMessageReceiverWidget extends Widget {
-
-    public interface PostMessageReceiverHandler {
-        public void onMessage(Message message);
-    }
-
-    protected class Message {
-        int id;
-        String origin;
-        String message;
-        JavaScriptObject source;
-        boolean cached;
-
-        public Message(int id, String message, String origin,
-                JavaScriptObject source, boolean cached) {
-            this.id = id;
-            this.message = message;
-            this.origin = origin;
-            this.source = source;
-            this.cached = cached;
-        }
-    }
-
-    public static final String CLASSNAME = "postmessage-receiver";
+public class PostMessageReceiver implements HasPostMessageHandlers {
 
     protected final List<String> trustedMessageOrigins;
 
-    protected final List<Message> cachedMessages;
+    protected final List<PostMessage> cachedMessages;
 
-    protected List<Message> messageList;
+    protected List<PostMessage> messageList;
 
     protected int messageCounter = 0;
-
-    protected final List<PostMessageReceiverHandler> handlers;
 
     protected final boolean isIE8;
 
     boolean cacheMessages = true;
 
-    public PostMessageReceiverWidget() {
-        createDOM();
+    private HandlerManager handlerManager;
 
+    public PostMessageReceiver() {
         trustedMessageOrigins = new ArrayList<String>();
-        cachedMessages = new ArrayList<Message>();
-        messageList = new ArrayList<Message>();
-        handlers = new ArrayList<PostMessageReceiverHandler>();
+        cachedMessages = new ArrayList<PostMessage>();
+        messageList = new ArrayList<PostMessage>();
         listener = addMessageHandler();
         isIE8 = BrowserInfo.get().isIE8();
     }
 
-    protected void createDOM() {
-        setElement(Document.get().createDivElement());
-        setStyleName(CLASSNAME);
-        getStyleElement().getStyle().setDisplay(Display.NONE);
+    /**
+     * Ensures the existence of the handler manager.
+     *
+     * @return the handler manager
+     * */
+    HandlerManager ensureHandlers() {
+        return handlerManager == null ? handlerManager = new HandlerManager(
+                this) : handlerManager;
     }
 
-    public void addPostMessageReceiverHandler(PostMessageReceiverHandler handler) {
-        handlers.add(handler);
+    public HandlerRegistration addPostMessageHandler(PostMessageHandler handler) {
+        return ensureHandlers()
+                .addHandler(
+                        com.vaadin.pekka.postmessage.client.receiver.PostMessageEvent
+                                .getType(), handler);
     }
 
-    public void removePostMessageReceiverHandler(
-            PostMessageReceiverHandler handler) {
-        handlers.remove(handler);
+    @Override
+    public void fireEvent(GwtEvent<?> event) {
+        if (handlerManager != null) {
+            handlerManager.fireEvent(event);
+        }
     }
 
     public void respondToMessage(int msgId, String msg, boolean parent) {
-        for (Message m : messageList) {
+        for (PostMessage m : messageList) {
             if (m.id == msgId) {
                 respondToMessage(m.source, parent, msg, m.origin);
             }
@@ -130,13 +113,12 @@ public class PostMessageReceiverWidget extends Widget {
         }
         trustedMessageOrigins.add(origin);
         if (!cachedMessages.isEmpty() && cacheMessages) {
-            for (Iterator<Message> i = cachedMessages.iterator(); i.hasNext();) {
+            for (Iterator<PostMessage> i = cachedMessages.iterator(); i
+                    .hasNext();) {
                 try {
-                    Message m = i.next();
+                    PostMessage m = i.next();
                     if (m.origin.equals(origin)) {
-                        for (PostMessageReceiverHandler handler : handlers) {
-                            handler.onMessage(m);
-                        }
+                        fireEvent(new PostMessageEvent(m));
                         i.remove();
                         messageList.add(m);
                     }
@@ -162,15 +144,31 @@ public class PostMessageReceiverWidget extends Widget {
             JavaScriptObject src) {
         int messageId = messageCounter++;
         if (trustedMessageOrigins.contains(origin)) {
-            final Message m = new Message(messageId, message, origin, src,
-                    false);
+            final PostMessage m = new PostMessage(messageId, message, origin,
+                    src, false);
             messageList.add(m);
-            for (PostMessageReceiverHandler handler : handlers) {
-                handler.onMessage(m);
-            }
+            fireEvent(new PostMessageEvent(m));
         } else if (cacheMessages) {
-            cachedMessages.add(new Message(messageId, message, origin, src,
+            cachedMessages.add(new PostMessage(messageId, message, origin, src,
                     true));
+        }
+    }
+
+    /**
+     *
+     */
+    public void remove() {
+        if (listener != null) {
+            removeMessageHandler(listener);
+        }
+        if (cachedMessages != null) {
+            cachedMessages.clear();
+        }
+        if (messageList != null) {
+            messageList.clear();
+        }
+        if (trustedMessageOrigins != null) {
+            trustedMessageOrigins.clear();
         }
     }
 
@@ -178,12 +176,17 @@ public class PostMessageReceiverWidget extends Widget {
 
     public native void postMessageToParent(String message, String targetOrigin)
     /*-{
-        $wnd.parent.postMessage(message, targetOrigin);
+        if ($wnd.parent) {
+            $wnd.parent.postMessage(message, targetOrigin);
+        }
     }-*/;
 
     public native void postMessageToOpener(String message, String targetOrigin)
     /*-{
-        $wnd.opener.postMessage(message, targetOrigin);
+        debugger;
+        if ($wnd.opener) {
+            $wnd.opener.postMessage(message, targetOrigin);
+        }
      }-*/;
 
     private native JavaScriptObject addMessageHandler()
@@ -192,12 +195,12 @@ public class PostMessageReceiverWidget extends Widget {
         var receiver = $entry(function(event)
         {
             var origin = event.origin;
-            var ok = self.@com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverWidget::checkOrigin(Ljava/lang/String;)(origin);
+            var ok = self.@com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiver::checkOrigin(Ljava/lang/String;)(origin);
             var src = event.source;
             if (ok)
             {
                 var message = event.data;
-                self.@com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverWidget::handleMessage(Ljava/lang/String;Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(message,origin,src);
+                self.@com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiver::handleMessage(Ljava/lang/String;Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;)(message,origin,src);
             }
         });
         if ($wnd.addEventListener) {

@@ -16,64 +16,68 @@
 package com.vaadin.pekka.postmessage.client.receiver;
 
 import com.vaadin.client.ApplicationConnection;
+import com.vaadin.client.ServerConnector;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
-import com.vaadin.client.ui.AbstractComponentConnector;
-import com.vaadin.pekka.postmessage.PostMessageReceiver;
-import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverWidget.Message;
+import com.vaadin.client.extensions.AbstractExtensionConnector;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension;
 import com.vaadin.shared.ui.Connect;
 
 @SuppressWarnings("serial")
-@Connect(PostMessageReceiver.class)
-public class PostMessageReceiverConnector extends AbstractComponentConnector {
+@Connect(PostMessageReceiverExtension.class)
+public class PostMessageReceiverConnector extends AbstractExtensionConnector {
 
     PostMessageReceiverServerRpc rpc = RpcProxy.create(
             PostMessageReceiverServerRpc.class, this);
 
+    private PostMessageReceiver receiver;
+
     @Override
     protected void init() {
         super.init();
+        receiver = new PostMessageReceiver();
+        receiver.addPostMessageHandler(new PostMessageHandler() {
+
+            @Override
+            public void onMessage(PostMessageEvent message) {
+                rpc.onMessage(message.getMessage().id,
+                        message.getMessage().message,
+                        message.getMessage().origin,
+                        message.getMessage().cached);
+            }
+        });
         registerRpc(PostMessageReceiverClientRpc.class,
                 new PostMessageReceiverClientRpc() {
                     public void postMessageToParent(String message,
                             String origin) {
-                        getWidget().postMessageToParent(message, origin);
+                        receiver.postMessageToParent(message, origin);
                     }
 
                     @Override
                     public void respondToMessage(int id, String message,
                             boolean parent) {
-                        getWidget().respondToMessage(id, message, parent);
+                        receiver.respondToMessage(id, message, parent);
                     }
 
                     @Override
                     public void postMessageToOpener(String message,
                             String origin) {
-                        getWidget().postMessageToOpener(message, origin);
+                        receiver.postMessageToOpener(message, origin);
                     }
                 });
 
-        getWidget().addPostMessageReceiverHandler(
-                new PostMessageReceiverWidget.PostMessageReceiverHandler() {
+    }
 
-                    @Override
-                    public void onMessage(Message message) {
-                        rpc.onMessage(message.id, message.message,
-                                message.origin, message.cached);
-                        pushRPCupdate(getConnection());
-                    }
-                });
+    @Override
+    public void onUnregister() {
+        super.onUnregister();
+        receiver.remove();
     }
 
     protected native void pushRPCupdate(ApplicationConnection conn)
     /*-{
         conn.@com.vaadin.client.ApplicationConnection::doSendPendingVariableChanges()();
     }-*/;
-
-    @Override
-    public PostMessageReceiverWidget getWidget() {
-        return (PostMessageReceiverWidget) super.getWidget();
-    }
 
     @Override
     public PostMessageReceiverState getState() {
@@ -84,13 +88,18 @@ public class PostMessageReceiverConnector extends AbstractComponentConnector {
     public void onStateChanged(StateChangeEvent stateChangeEvent) {
         super.onStateChanged(stateChangeEvent);
 
-        if (getState().cacheMessages != getWidget().cacheMessages) {
-            getWidget().setCacheMessages(getState().cacheMessages);
+        if (getState().cacheMessages != receiver.cacheMessages) {
+            receiver.setCacheMessages(getState().cacheMessages);
         }
 
         if (stateChangeEvent.hasPropertyChanged("trustedMessageOrigins")) {
-            getWidget().setupMessageOrigins(getState().trustedMessageOrigins);
+            receiver.setupMessageOrigins(getState().trustedMessageOrigins);
         }
+    }
+
+    @Override
+    protected void extend(ServerConnector target) {
+        // NOOP
     }
 
 }
