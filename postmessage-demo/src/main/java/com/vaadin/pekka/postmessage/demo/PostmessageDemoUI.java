@@ -25,8 +25,10 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.pekka.postmessage.PostMessageIFrame;
 import com.vaadin.pekka.postmessage.PostMessageIFrame.PostMessageIFrameEvent;
 import com.vaadin.pekka.postmessage.PostMessageIFrame.PostMessageIFrameListener;
-import com.vaadin.pekka.postmessage.PostMessageWindowUtil;
-import com.vaadin.pekka.postmessage.PostMessageWindowUtil.PostMessageWindow;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverEvent;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverListener;
+import com.vaadin.pekka.postmessage.PostMessageWindowExtension;
+import com.vaadin.pekka.postmessage.PostMessageWindowExtension.PostMessageWindow;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -74,8 +76,18 @@ public class PostmessageDemoUI extends UI {
         final VerticalLayout layout = new VerticalLayout();
         content.addComponent(layout);
 
-        final PostMessageWindowUtil windowOpener = new PostMessageWindowUtil();
+        final PostMessageWindowExtension windowOpener = new PostMessageWindowExtension();
         windowOpener.extend(this);
+        windowOpener.addPostMessageListener(new PostMessageReceiverListener() {
+
+            @Override
+            public void onMessage(PostMessageReceiverEvent event) {
+                ((VerticalLayout) messages.getContent())
+                        .addComponent(new Label(event.getMessage() + ", "
+                                + event.getOrigin() + ", "
+                                + event.getComponent()));
+            }
+        });
 
         final HorizontalLayout windowops = new HorizontalLayout();
         final ComboBox winselect = new ComboBox();
@@ -101,13 +113,19 @@ public class PostmessageDemoUI extends UI {
                     public void buttonClick(ClickEvent event) {
                         PostMessageWindow window;
                         if (winLocSelect.getValue().equals(iframeOrigin2)) {
+                            windowOpener
+                                    .addAcceptedMessageOrigin(iframeOrigin1);
                             window = windowOpener.openWindow(iframeLocation2,
                                     iframeOrigin2, "width=400,height=400");
                         } else if (winLocSelect.getValue()
                                 .equals(iframeOrigin1)) {
+                            windowOpener
+                                    .addAcceptedMessageOrigin(iframeOrigin2);
                             window = windowOpener.openWindow(iframeLocation1,
                                     iframeOrigin1, "width=400,height=400");
                         } else {
+                            windowOpener
+                                    .addAcceptedMessageOrigin(iframeOrigin3);
                             window = windowOpener.openWindow(iframeLocation3,
                                     iframeOrigin3, "width=700,height=400");
                         }

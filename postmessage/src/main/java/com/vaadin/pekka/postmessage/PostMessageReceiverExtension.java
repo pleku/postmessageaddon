@@ -36,7 +36,7 @@ import com.vaadin.ui.Component;
  * When using inside a sub window and want to send to opener window, use
  * {@link #postMessageToOpener(String, String)}.
  * <p>
- * For sending messages to an opened window, use {@link PostMessageWindowUtil}.
+ * For sending messages to an opened window, use {@link PostMessageWindowExtension}.
  *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
  *

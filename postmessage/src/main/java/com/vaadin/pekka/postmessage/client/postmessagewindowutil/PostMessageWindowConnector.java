@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,13 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.vaadin.client.ServerConnector;
 import com.vaadin.client.communication.RpcProxy;
-import com.vaadin.client.extensions.AbstractExtensionConnector;
-import com.vaadin.pekka.postmessage.PostMessageWindowUtil;
+import com.vaadin.pekka.postmessage.PostMessageWindowExtension;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverConnector;
 import com.vaadin.shared.ui.Connect;
 
 @SuppressWarnings("serial")
-@Connect(PostMessageWindowUtil.class)
-public class PostMessageWindowUtilConnector extends AbstractExtensionConnector {
+@Connect(PostMessageWindowExtension.class)
+public class PostMessageWindowConnector extends PostMessageReceiverConnector {
 
     PostMessageWindowUtilServerRpc rpc = RpcProxy.create(
             PostMessageWindowUtilServerRpc.class, this);
@@ -34,14 +34,14 @@ public class PostMessageWindowUtilConnector extends AbstractExtensionConnector {
     private JsArrayString origins = JsArrayString.createArray().cast();
     private JsArray<JavaScriptObject> windows = JsArray.createArray().cast();
 
-    public PostMessageWindowUtilConnector() {
+    public PostMessageWindowConnector() {
         registerRpc(PostMessageWindowUtilClientRpc.class,
                 new PostMessageWindowUtilClientRpc() {
 
                     @Override
                     public void openWindow(String url, String origin,
                             String features) {
-                        windows.push(PostMessageWindowUtilConnector.this
+                        windows.push(PostMessageWindowConnector.this
                                 .openWindow(url, features));
                         origins.push(origin);
                     }
@@ -54,7 +54,7 @@ public class PostMessageWindowUtilConnector extends AbstractExtensionConnector {
 
                     @Override
                     public void closeWindow(int messageWindowId) {
-                        PostMessageWindowUtilConnector.this.closeWindow(windows
+                        PostMessageWindowConnector.this.closeWindow(windows
                                 .get(messageWindowId));
                     }
                 });

@@ -21,7 +21,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.pekka.postmessage.PostMessageIFrame.PostMessageIFrameEvent;
 import com.vaadin.pekka.postmessage.PostMessageIFrame.PostMessageIFrameListener;
-import com.vaadin.pekka.postmessage.PostMessageWindowUtil.PostMessageWindow;
+import com.vaadin.pekka.postmessage.PostMessageWindowExtension.PostMessageWindow;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
@@ -65,7 +65,7 @@ public class PostmessageDemoUI extends UI {
         final VerticalLayout layout = new VerticalLayout();
         content.addComponent(layout);
 
-        final PostMessageWindowUtil windowOpener = new PostMessageWindowUtil();
+        final PostMessageWindowExtension windowOpener = new PostMessageWindowExtension();
         windowOpener.extend(this);
 
         final HorizontalLayout windowops = new HorizontalLayout();

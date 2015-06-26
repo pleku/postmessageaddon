@@ -155,7 +155,7 @@ public class PostMessageReceiver implements HasPostMessageHandlers {
     }
 
     /**
-     *
+     * Removes the listener for postMessages and clears all content.
      */
     public void remove() {
         if (listener != null) {
