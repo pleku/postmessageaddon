@@ -10,28 +10,16 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.4.8</vaadin.version>
+		<vaadin.version>7.5.2</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
 
-    <!--     
-	<organization>
-		<name>My Name</name>
-		<url>https://github.com/mygithubaccount/PostMessageIFrame/</url>
-	</organization>
-    
-	<scm>
-		<url>git://github.com/mygithubaccount/PostMessageIFrame.git</url>
-		<connection>scm:git:git://github.com/mygithubaccount/PostMessageIFrame.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${ComponentClassName}.git</developerConnection>
-		<tag>PostMessageIFrame add-on for Vaadin</tag>
-	</scm>
-
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/mygithubaccount/PostMessageIFrame/issues</url>
-	</issueManagement>
-    -->
+	<!-- <organization> <name>My Name</name> <url>https://github.com/mygithubaccount/PostMessageIFrame/</url> 
+		</organization> <scm> <url>git://github.com/mygithubaccount/PostMessageIFrame.git</url> 
+		<connection>scm:git:git://github.com/mygithubaccount/PostMessageIFrame.git</connection> 
+		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${ComponentClassName}.git</developerConnection> 
+		<tag>PostMessageIFrame add-on for Vaadin</tag> </scm> <issueManagement> <system>GitHub</system> 
+		<url>https://github.com/mygithubaccount/PostMessageIFrame/issues</url> </issueManagement> -->
 
 	<licenses>
 		<license>
@@ -107,6 +95,11 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.vaadin.icons</groupId>
+			<artifactId>vaadin-icons</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -140,10 +133,10 @@
 			</plugin>
 
 			<plugin>
-		        <artifactId>maven-war-plugin</artifactId>
-		        <version>2.3</version>
-		        <configuration>
-		        	<packagingExcludes>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<packagingExcludes>
 						**/VAADIN/gwt-unitCache/**,
 						**/VAADIN/widgetsets/WEB-INF/**,
 						**/WEB-INF/lib/servlet-api-*.jar,
@@ -155,7 +148,7 @@
 						**/WEB-INF/classes/widgetsets/**
 					</packagingExcludes>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-		        </configuration>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -199,10 +192,11 @@
 			</plugin>
 
 		</plugins>
-	
+
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>

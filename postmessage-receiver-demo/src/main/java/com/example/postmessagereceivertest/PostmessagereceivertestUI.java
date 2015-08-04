@@ -2,7 +2,11 @@ package com.example.postmessagereceivertest;
 
 import javax.servlet.annotation.WebServlet;
 
+import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.pekka.postmessage.PostMessageReceiverExtension;
 import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverEvent;
 import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverListener;
@@ -10,15 +14,20 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 /**
  * Main UI class
  */
+@Theme("tests-valo-flatdark")
 @SuppressWarnings("serial")
 public class PostmessagereceivertestUI extends UI {
 
@@ -31,123 +40,87 @@ public class PostmessagereceivertestUI extends UI {
     protected void init(VaadinRequest request) {
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
+        layout.setSpacing(true);
         setContent(layout);
 
-        Label label = new Label("PostMessageReceiver testing");
+        Label label = new Label("PostMessageReceiver Testing @ "
+                + getPage().getLocation());
+        label.addStyleName("h3");
         layout.addComponent(label);
-
-        final Panel panel = new Panel("Received message events");
-        final VerticalLayout messages = new VerticalLayout();
-        panel.setContent(messages);
 
         final PostMessageReceiverExtension receiver = new PostMessageReceiverExtension();
         addExtension(receiver);
+        receiver.addAcceptedMessageOrigin("http://localhost:8088");
+        receiver.addAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
+        receiver.addAcceptedMessageOrigin("http://pekka.app.fi");
 
-        final TextField messageField = new TextField("Type message here");
+        final TextArea messageField = new TextArea(
+                "Type text to send to parent frame / window");
+        messageField.setWidth("100%");
+        messageField.setRows(2);
         layout.addComponent(messageField);
+        HorizontalLayout buttons = new HorizontalLayout(new Button(
+                "Send text to window.parent", new Button.ClickListener() {
 
-        receiver.addListener(new PostMessageReceiverListener() {
+                    @Override
+                    public void buttonClick(ClickEvent event) {
+                        receiver.postMessageToParent(messageField.getValue(),
+                                "*");
+                    }
+                }), new Button("Send text to window.opener",
+                new Button.ClickListener() {
 
-            public void onMessage(PostMessageReceiverEvent event) {
-                messages.addComponentAsFirst(new Label(event.getMessage()
-                        + ", " + event.getOrigin() + ", "
-                        + event.getComponent().getId()));
-                if (event.getMessage().equals("size?")) {
-                    receiver.postMessageToParent(
-                            "size,"
-                                    + Integer.toString((int) (Math.random() * 600))
-                                    + "px,"
-                                    + Integer.toString((int) (Math.random() * 600))
-                                    + "px", event.getOrigin());
-                } else if (event.getMessage().startsWith("respond")) {
-                    event.respond("Response is: " + messageField.getValue(),
-                            true);
-                } else if (event.getMessage().equals("close")) {
-                    close();
+                    @Override
+                    public void buttonClick(ClickEvent event) {
+                        receiver.postMessageToOpener(messageField.getValue(),
+                                "*");
+                    }
+                }));
+        buttons.setSpacing(true);
+        layout.addComponent(buttons);
+
+        final CheckBox acceptMessages = new CheckBox("Accept messages", true);
+        acceptMessages.addValueChangeListener(new ValueChangeListener() {
+
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                if (acceptMessages.getValue()) {
+                    receiver.addAcceptedMessageOrigin("http://localhost:8088");
+                    receiver.addAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
+                    receiver.addAcceptedMessageOrigin("http://pekka.app.fi");
+                } else {
+                    receiver.clearAllAcceptedMessageOrigins();
                 }
             }
         });
 
-        Button button3 = new Button("post to $wnd.parent using executeJS");
-        button3.addClickListener(new Button.ClickListener() {
+        layout.addComponent(acceptMessages);
 
-            public void buttonClick(ClickEvent event) {
+        final BeanItemContainer<PostMessageReceiverEvent> messageContainer = new BeanItemContainer<PostMessageReceiverEvent>(
+                PostMessageReceiverEvent.class);
+        Grid grid = new Grid();
+        grid.setCaption("Received messages");
+        grid.setSizeFull();
+        grid.setContainerDataSource(messageContainer);
+        grid.getColumn("connector").setHidden(true);
+        grid.getColumn("source").setHidden(true);
+        grid.getColumn("messageId").setHeaderCaption("Id");
+        grid.getColumn("message").setExpandRatio(2);
+        grid.getColumn("origin").setExpandRatio(1);
+        grid.getColumn("messageId").setWidth(40);
+        grid.getColumn("component").setHidden(true);
+        for (Column c : grid.getColumns()) {
+            c.setHidable(true);
+        }
+        grid.setSelectionMode(SelectionMode.NONE);
+        layout.addComponent(grid);
 
-                getPage().getJavaScript().execute(
-                        "window.parent.postMessage('" + messageField.getValue()
-                                + "', 'http://localhost:8080');");
-                getPage()
-                        .getJavaScript()
-                        .execute(
-                                "window.parent.postMessage('"
-                                        + messageField.getValue()
-                                        + "', 'http://pekka.virtuallypreinstalled.com');");
-                getPage().getJavaScript().execute(
-                        "window.parent.postMessage('" + messageField.getValue()
-                                + "', 'http://pekka.app.fi');");
+        receiver.addListener(new PostMessageReceiverListener() {
+
+            public void onMessage(PostMessageReceiverEvent event) {
+                messageContainer.addBean(event);
             }
         });
-        // layout.addComponent(button3);
-
-        Button button4 = new Button("post to $wnd.parent using receiver");
-        button4.addClickListener(new Button.ClickListener() {
-
-            public void buttonClick(ClickEvent event) {
-                receiver.postMessageToParent(messageField.getValue(),
-                        "http://localhost:8080");
-                receiver.postMessageToParent(messageField.getValue(),
-                        "http://pekka.virtuallypreinstalled.com");
-                receiver.postMessageToParent(messageField.getValue(),
-                        "http://pekka.app.fi");
-            }
-        });
-        layout.addComponent(button4);
-
-        Button button5 = new Button("post to $wnd.opener using receiver");
-        button5.addClickListener(new Button.ClickListener() {
-
-            public void buttonClick(ClickEvent event) {
-                receiver.postMessageToOpener(messageField.getValue(),
-                        "http://localhost:8080");
-                receiver.postMessageToOpener(messageField.getValue(),
-                        "http://pekka.virtuallypreinstalled.com");
-                receiver.postMessageToOpener(messageField.getValue(),
-                        "http://pekka.app.fi");
-            }
-        });
-        layout.addComponent(button5);
-
-        final Button button2 = new Button(
-                "add parent location to trusted origins");
-        final Button button1 = new Button(
-                "remove parent location from trusted origins");
-        button2.addClickListener(new Button.ClickListener() {
-
-            public void buttonClick(ClickEvent event) {
-                receiver.addAcceptedMessageOrigin("http://localhost:8080");
-                receiver.addAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
-                receiver.addAcceptedMessageOrigin("http://pekka.app.fi");
-                event.getButton().setEnabled(false);
-                button1.setEnabled(true);
-            }
-        });
-        layout.addComponent(button2);
-
-        button1.setEnabled(false);
-        button1.addClickListener(new Button.ClickListener() {
-
-            public void buttonClick(ClickEvent event) {
-                receiver.removeAcceptedMessageOrigin("http://localhost:8080");
-                receiver.removeAcceptedMessageOrigin("http://pekka.virtuallypreinstalled.com");
-                receiver.removeAcceptedMessageOrigin("http://pekka.app.fi");
-                event.getButton().setEnabled(false);
-                button2.setEnabled(true);
-            }
-        });
-        layout.addComponent(button1);
-
-        layout.addComponent(panel);
 
     }
-
 }
