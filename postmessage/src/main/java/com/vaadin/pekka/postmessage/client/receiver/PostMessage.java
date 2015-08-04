@@ -3,11 +3,11 @@ package com.vaadin.pekka.postmessage.client.receiver;
 import com.google.gwt.core.client.JavaScriptObject;
 
 public class PostMessage {
-    final int id;
-    final String origin;
-    final String message;
-    final JavaScriptObject source;
-    final boolean cached;
+    public final int id;
+    public final String origin;
+    public final String message;
+    public final JavaScriptObject source;
+    public final boolean cached;
 
     public PostMessage(int id, String message, String origin,
             JavaScriptObject source, boolean cached) {

@@ -41,8 +41,8 @@ public class PostMessageIFrame extends BrowserFrame {
     private PostMessageIFrameServerRpc rpc = new PostMessageIFrameServerRpc() {
 
         @Override
-        public void onMessage(String message, String origin) {
-            fireMessageEvent(message, origin, -1);
+        public void onMessage(String message, String origin, int id) {
+            fireMessageEvent(message, origin, id);
         }
     };
 
@@ -191,7 +191,8 @@ public class PostMessageIFrame extends BrowserFrame {
     }
 
     /**
-     * Start or stop to listen to messages from the iframe's origin.
+     * Start or stop to listen to messages from the iframe's origin set with
+     * {@link #setIframeOrigin(String)}. Default is <code>false</code>.
      *
      * @param alwaysListen
      *            <code>true</code> to listen, <code>false</code> to not

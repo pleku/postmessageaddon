@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2013 Pekka Hyvönen, pekka@vaadin.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,14 +23,16 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.vaadin.client.BrowserInfo;
 import com.vaadin.client.ui.VBrowserFrame;
+import com.vaadin.pekka.postmessage.client.receiver.HasPostMessageHandlers;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessage;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageEvent;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageHandler;
 
-public class PostMessageIFrameWidget extends VBrowserFrame {
-
-    public interface PostMessageIFrameWidgetHandler {
-        public void onMessage(String message, String origin);
-    }
+public class PostMessageIFrameWidget extends VBrowserFrame implements
+        HasPostMessageHandlers {
 
     public static final String CLASSNAME = "postmessage-iframe";
 
@@ -41,7 +43,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     protected int pendingResponses = 0;
     protected final boolean isIE8;
     protected List<String[]> waitingMessages;
-    protected List<PostMessageIFrameWidgetHandler> handlers;
+    protected int messageCounter = 0;
 
     protected JavaScriptObject listener;
 
@@ -52,15 +54,6 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
 
         isIE8 = BrowserInfo.get().isIE8();
         waitingMessages = new ArrayList<String[]>();
-        handlers = new ArrayList<PostMessageIFrameWidgetHandler>();
-    }
-
-    public void addHandler(PostMessageIFrameWidgetHandler handler) {
-        handlers.add(handler);
-    }
-
-    public void removeHandler(PostMessageIFrameWidgetHandler handler) {
-        handlers.remove(handler);
     }
 
     protected void setupListener() {
@@ -122,9 +115,10 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
 
     void receiveResponse(String message, String receivedOrigin) {
         if ((alwaysListen || pendingResponses > 0) && receivedOrigin != null) {
-            for (PostMessageIFrameWidgetHandler handler : handlers) {
-                handler.onMessage(message, receivedOrigin);
-            }
+            int messageId = messageCounter++;
+            final PostMessage m = new PostMessage(messageId, message,
+                    receivedOrigin, null, false);
+            fireEvent(new PostMessageEvent(m));
             if (!alwaysListen) {
                 pendingResponses--;
             }
@@ -175,7 +169,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
             } else {
                 str = 'ie';
             }
-            if (str && (0 !== str.length) ) 
+            if (str && (0 !== str.length) )
                 self.@com.vaadin.pekka.postmessage.client.iframe.PostMessageIFrameWidget::onIFrameLoad(Ljava/lang/String;)(str);
         };
         if (iframe.addEventListener)
@@ -197,7 +191,7 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     /*-{
         var src = iframe.src;
         iframe.contentWindow.location.href= src;
-        
+
     }-*/;
 
     protected native JavaScriptObject addResponseListener()
@@ -230,5 +224,12 @@ public class PostMessageIFrameWidget extends VBrowserFrame {
     	    $wnd.detachevent('onmessage', l);
     	}
     }-*/;
+
+    @Override
+    public HandlerRegistration addPostMessageHandler(PostMessageHandler handler) {
+        return addHandler(handler,
+                com.vaadin.pekka.postmessage.client.receiver.PostMessageEvent
+                        .getType());
+    }
 
 }

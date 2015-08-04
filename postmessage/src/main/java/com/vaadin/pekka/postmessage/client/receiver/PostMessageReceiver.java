@@ -183,7 +183,6 @@ public class PostMessageReceiver implements HasPostMessageHandlers {
 
     public native void postMessageToOpener(String message, String targetOrigin)
     /*-{
-        debugger;
         if ($wnd.opener) {
             $wnd.opener.postMessage(message, targetOrigin);
         }

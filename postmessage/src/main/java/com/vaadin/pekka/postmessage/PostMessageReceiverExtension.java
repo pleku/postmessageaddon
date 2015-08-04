@@ -36,7 +36,8 @@ import com.vaadin.ui.Component;
  * When using inside a sub window and want to send to opener window, use
  * {@link #postMessageToOpener(String, String)}.
  * <p>
- * For sending messages to an opened window, use {@link PostMessageWindowExtension}.
+ * For sending messages to an opened window, use
+ * {@link PostMessageWindowExtension}.
  *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
  *
@@ -140,6 +141,13 @@ public class PostMessageReceiverExtension extends AbstractExtension {
     }
 
     /**
+     * Clears the current accepted message origins.
+     */
+    public void clearAllAcceptedMessageOrigins() {
+        getState().trustedMessageOrigins.clear();
+    }
+
+    /**
      * Remove an accepted message origin. After this, no messages for this
      * origin will get through, but if {@link #isCacheMessages()} mode is on,
      * then they are still cached.
@@ -186,7 +194,7 @@ public class PostMessageReceiverExtension extends AbstractExtension {
      * the messages' origin will get added to accepted message origins with
      * {@link #addAcceptedMessageOrigin(String)}. Disabling the cache will clear
      * all the currently cached messages.
-     *
+     * <p>
      * Default value is <code>true</code>.
      *
      * @param cacheMessages
