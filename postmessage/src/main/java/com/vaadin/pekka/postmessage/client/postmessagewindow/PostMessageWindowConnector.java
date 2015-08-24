@@ -13,37 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.vaadin.pekka.postmessage.client.postmessagewindowutil;
+package com.vaadin.pekka.postmessage.client.postmessagewindow;
+
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayString;
 import com.vaadin.client.ServerConnector;
 import com.vaadin.client.communication.RpcProxy;
+import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.pekka.postmessage.PostMessageWindowExtension;
-import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiverConnector;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageEvent;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageHandler;
+import com.vaadin.pekka.postmessage.client.receiver.PostMessageReceiver;
 import com.vaadin.shared.ui.Connect;
 
 @SuppressWarnings("serial")
 @Connect(PostMessageWindowExtension.class)
-public class PostMessageWindowConnector extends PostMessageReceiverConnector {
+public class PostMessageWindowConnector extends AbstractExtensionConnector {
 
-    PostMessageWindowUtilServerRpc rpc = RpcProxy.create(
-            PostMessageWindowUtilServerRpc.class, this);
+    PostMessageWindowServerRpc rpc = RpcProxy.create(
+            PostMessageWindowServerRpc.class, this);
 
     private JsArrayString origins = JsArrayString.createArray().cast();
     private JsArray<JavaScriptObject> windows = JsArray.createArray().cast();
 
+    private PostMessageReceiver receiver;
+
+    private Logger logger = Logger.getLogger(PostMessageWindowConnector.class
+            .getName());
+
     public PostMessageWindowConnector() {
-        registerRpc(PostMessageWindowUtilClientRpc.class,
-                new PostMessageWindowUtilClientRpc() {
+        registerRpc(PostMessageWindowClientRpc.class,
+                new PostMessageWindowClientRpc() {
 
                     @Override
-                    public void openWindow(String url, String origin,
-                            String features) {
+                    public void openWindow(String url, int messageWindowId,
+                            String origin, String features) {
                         windows.push(PostMessageWindowConnector.this
                                 .openWindow(url, features));
                         origins.push(origin);
+                        receiver.addMessageOrigin(origin);
                     }
 
                     @Override
@@ -59,12 +70,36 @@ public class PostMessageWindowConnector extends PostMessageReceiverConnector {
                     }
                 });
 
+        receiver = new PostMessageReceiver();
+        receiver.addPostMessageHandler(new PostMessageHandler() {
+
+            @Override
+            public void onMessage(PostMessageEvent message) {
+                final JavaScriptObject source = message.getMessage().source;
+                for (int i = 0; i < windows.length(); i++) {
+                    final JavaScriptObject window = windows.get(i);
+                    if (checkWindowEquality(source, window)) {
+                        rpc.onMessage(message.getMessage().message,
+                                message.getMessage().origin, i);
+                        return;
+                    }
+                }
+                logger.severe("Received message from unknown source: "
+                        + message.getMessage().toString());
+            }
+        });
     }
 
     @Override
     protected void extend(ServerConnector target) {
         // nothing to do here
     }
+
+    protected native boolean checkWindowEquality(JavaScriptObject source,
+            JavaScriptObject window)
+    /*-{
+        return source == window || (source.parent && source.parent == window);
+    }-*/;
 
     protected native JavaScriptObject openWindow(String url, String features)
     /*-{

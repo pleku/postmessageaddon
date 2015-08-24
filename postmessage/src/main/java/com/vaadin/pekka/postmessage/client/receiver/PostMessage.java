@@ -21,7 +21,7 @@ public class PostMessage {
     @Override
     public String toString() {
         return "PostMessage [id=" + id + ", origin=" + origin + ", message="
-                + message + ", source=" + source + ", cached=" + cached + "]";
+                + message + ", cached=" + cached + "]";
     }
 
 }

@@ -37,11 +37,13 @@ import com.vaadin.ui.Component;
  * {@link #postMessageToOpener(String, String)}.
  * <p>
  * For sending messages to an opened window, use
- * {@link PostMessageWindowExtension}.
+ * {@link PostMessageWindow}.
+ * <p>
+ * For sending messages inside an iframe, use {@link PostMessageIFrame}.
  *
  * https://developer.mozilla.org/en-US/docs/DOM/window.postMessage
  *
- * @author pekkahyvonen
+ * @author pekka@vaadin.com
  */
 @SuppressWarnings("serial")
 public class PostMessageReceiverExtension extends AbstractExtension {
@@ -258,7 +260,7 @@ public class PostMessageReceiverExtension extends AbstractExtension {
 
     static {
         try {
-            POST_MESSAGE_EVENT_METHOD = PostMessageReceiverListener.class
+            POST_MESSAGE_EVENT_METHOD = PostMessageListener.class
                     .getDeclaredMethod("onMessage",
                             new Class[] { PostMessageReceiverEvent.class });
         } catch (final java.lang.NoSuchMethodException e) {
@@ -275,7 +277,7 @@ public class PostMessageReceiverExtension extends AbstractExtension {
      * @author pekkahyvonen
      *
      */
-    public interface PostMessageReceiverListener extends Serializable {
+    public interface PostMessageListener extends Serializable {
 
         /**
          * Called on a {@link PostMessageReceiverEvent} from a
@@ -289,51 +291,51 @@ public class PostMessageReceiverExtension extends AbstractExtension {
     }
 
     /**
-     * Registers a {@link PostMessageReceiverListener} listener for
+     * Registers a {@link PostMessageListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to register
      */
-    public void addListener(PostMessageReceiverListener listener) {
+    public void addListener(PostMessageListener listener) {
         addPostMessageListener(listener);
     }
 
     /**
-     * Registers a {@link PostMessageReceiverListener} listener for
+     * Registers a {@link PostMessageListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to register
      */
-    public void addPostMessageListener(PostMessageReceiverListener listener) {
+    public void addPostMessageListener(PostMessageListener listener) {
         addListener(PostMessageReceiverEvent.class, listener,
                 POST_MESSAGE_EVENT_METHOD);
     }
 
     /**
-     * Removes a registered {@link PostMessageReceiverListener} listener for
+     * Removes a registered {@link PostMessageListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to remove
      */
-    public void removeListener(PostMessageReceiverListener listener) {
+    public void removeListener(PostMessageListener listener) {
         removePostMessageListener(listener);
     }
 
     /**
-     * Removes a registered {@link PostMessageReceiverListener} listener for
+     * Removes a registered {@link PostMessageListener} listener for
      * {@link PostMessageReceiverEvent} events from this
      * {@link PostMessageReceiverExtension}.
      *
      * @param listener
      *            the listener to remove
      */
-    public void removePostMessageListener(PostMessageReceiverListener listener) {
+    public void removePostMessageListener(PostMessageListener listener) {
         removeListener(PostMessageReceiverEvent.class, listener,
                 POST_MESSAGE_EVENT_METHOD);
     }
