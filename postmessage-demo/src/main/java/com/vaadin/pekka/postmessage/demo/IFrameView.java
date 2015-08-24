@@ -1,5 +1,6 @@
 package com.vaadin.pekka.postmessage.demo;
 
+import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -15,7 +16,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
@@ -25,7 +25,7 @@ public class IFrameView extends HorizontalLayout implements View {
 
     private PostMessageIFrame iframe;
     private ComboBox locationSelect;
-    private BeanItemContainer<PostMessageIFrameEvent> messageContainer;
+    private BeanItemContainer<PostMessageBean> messageContainer;
     private Grid grid;
     private VerticalLayout left;
 
@@ -45,9 +45,9 @@ public class IFrameView extends HorizontalLayout implements View {
         left.addComponent(locationSelect);
         addComponent(left);
 
-        messageContainer = new BeanItemContainer<PostMessageIFrameEvent>(
-                PostMessageIFrameEvent.class);
-        createGrid();
+        messageContainer = new BeanItemContainer<PostMessageBean>(
+                PostMessageBean.class);
+        grid = createGrid(messageContainer);
 
         locationSelect.setValue(PostmessageDemoUI.iframeOrigin3);
     }
@@ -57,22 +57,20 @@ public class IFrameView extends HorizontalLayout implements View {
 
     }
 
-    private void createGrid() {
-        grid = new Grid();
+    public static Grid createGrid(Indexed messageContainer) {
+        final Grid grid = new Grid();
         grid.setCaption("Received messages from iframe");
         grid.setSizeFull();
         grid.setContainerDataSource(messageContainer);
-        grid.getColumn("connector").setHidden(true);
-        grid.getColumn("source").setHidden(true);
         grid.getColumn("messageId").setHeaderCaption("Id");
         grid.getColumn("message").setExpandRatio(2);
         grid.getColumn("origin").setExpandRatio(1);
         grid.getColumn("messageId").setWidth(40);
-        grid.getColumn("component").setHidden(true);
         for (Column c : grid.getColumns()) {
             c.setHidable(true);
         }
-        grid.setSelectionMode(SelectionMode.NONE);
+
+        return grid;
     }
 
     private void createIFrame() {
@@ -83,7 +81,7 @@ public class IFrameView extends HorizontalLayout implements View {
 
             @Override
             public void onMessage(PostMessageIFrameEvent event) {
-                messageContainer.addBean(event);
+                messageContainer.addBean(new PostMessageBean(event));
             }
         });
 
@@ -104,6 +102,7 @@ public class IFrameView extends HorizontalLayout implements View {
                         iframe.postMessageToIFrame(textArea.getValue(), true);
                     }
                 });
+        sendButton.addStyleName("primary");
         messageLayout.addComponent(sendButton);
         messageLayout
                 .setComponentAlignment(sendButton, Alignment.MIDDLE_CENTER);
@@ -160,5 +159,42 @@ public class IFrameView extends HorizontalLayout implements View {
         cb.addItem(PostmessageDemoUI.iframeOrigin2);
         cb.addItem(PostmessageDemoUI.iframeOrigin3);
         return cb;
+    }
+
+    public static class PostMessageBean {
+        private String message;
+        private Integer messageId;
+        private String origin;
+
+        public PostMessageBean(PostMessageIFrameEvent event) {
+            message = event.getMessage();
+            messageId = event.getMessageId();
+            origin = event.getOrigin();
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public Integer getMessageId() {
+            return messageId;
+        }
+
+        public void setMessageId(Integer messageId) {
+            this.messageId = messageId;
+        }
+
+        public String getOrigin() {
+            return origin;
+        }
+
+        public void setOrigin(String origin) {
+            this.origin = origin;
+        }
+
     }
 }

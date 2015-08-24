@@ -9,7 +9,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.pekka.postmessage.PostMessageReceiverExtension;
 import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverEvent;
-import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageReceiverListener;
+import com.vaadin.pekka.postmessage.PostMessageReceiverExtension.PostMessageListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
@@ -59,15 +59,17 @@ public class PostmessagereceivertestUI extends UI {
         messageField.setWidth("100%");
         messageField.setRows(2);
         layout.addComponent(messageField);
-        HorizontalLayout buttons = new HorizontalLayout(new Button(
-                "Send text to window.parent", new Button.ClickListener() {
+        Button parentButton = new Button("Send text to window.parent",
+                new Button.ClickListener() {
 
                     @Override
                     public void buttonClick(ClickEvent event) {
                         receiver.postMessageToParent(messageField.getValue(),
                                 "*");
                     }
-                }), new Button("Send text to window.opener",
+                });
+        parentButton.addStyleName("primary");
+        Button openerButton = new Button("Send text to window.opener",
                 new Button.ClickListener() {
 
                     @Override
@@ -75,7 +77,11 @@ public class PostmessagereceivertestUI extends UI {
                         receiver.postMessageToOpener(messageField.getValue(),
                                 "*");
                     }
-                }));
+                });
+        openerButton.addStyleName("friendly");
+        HorizontalLayout horizontalLayout = new HorizontalLayout(parentButton,
+                openerButton);
+        HorizontalLayout buttons = horizontalLayout;
         buttons.setSpacing(true);
         layout.addComponent(buttons);
 
@@ -115,7 +121,7 @@ public class PostmessagereceivertestUI extends UI {
         grid.setSelectionMode(SelectionMode.NONE);
         layout.addComponent(grid);
 
-        receiver.addListener(new PostMessageReceiverListener() {
+        receiver.addListener(new PostMessageListener() {
 
             public void onMessage(PostMessageReceiverEvent event) {
                 messageContainer.addBean(event);

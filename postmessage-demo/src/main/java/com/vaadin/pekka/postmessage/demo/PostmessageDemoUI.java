@@ -23,7 +23,6 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -60,14 +59,4 @@ public class PostmessageDemoUI extends UI {
         navigator.addView("popup-window", PopUpWindowView.class);
     }
 
-    private ComboBox createSelect(String caption) {
-        final ComboBox cb = new ComboBox(caption);
-        cb.setNullSelectionAllowed(false);
-        cb.setImmediate(true);
-        cb.addItem(iframeOrigin1);
-        cb.addItem(iframeOrigin2);
-        cb.addItem(iframeOrigin3);
-        cb.setValue(iframeOrigin1);
-        return cb;
-    }
 }
