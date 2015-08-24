@@ -11,7 +11,7 @@ PostMessageReceiver - for receiving and responding to messages, ie. when your ap
 
 PostMessageIFrame - when you need to embed and communicate with another app or page. Extends BrowserFrame component from core Vaadin Framework.
 
-PostMessageWindowUtils - for opening a location in another browser window/tab and posting message into them. Doesn't currently support directly listening to messages from opened windows, but the PostMessageReceiver can be used for this.
+PostMessageWindow - for opening a location in another browser window/tab and posting/receiving messages to/from them.
 
 
 ## License
@@ -27,12 +27,16 @@ The project is licensed under the [Apache License, Version 2.0](http://www.apach
 
 ## Online Demo
 
-http://pekka.virtuallypreinstalled.com/PostMessageAddon/
+http://pekka.app.fi/postmessage-demo/
+
+## Relase notes 1.1.0
+
+- refactored demos
+- added support for posting & receiving messages to & from popup windows with PostMessageWindowExtension
+- added support for PostMessageReceiver to send messages to window.opener
 
 
-## TODO (1.0.1)
+## TODO (1.1.0)
 
 - Support other message types than String, like data objects File, Blob, FileList and ArrayBuffer.
-- Add support to PostMessageWindowUtils for listening to Post Messages from the opened windows.
-- Refactor PostMessageReceiver from a component into an UI Extension
 - Investigate IE support for popup windows using a workaround
